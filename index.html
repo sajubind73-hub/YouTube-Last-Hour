@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Last 1 Hour Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 { text-align: center; }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button {
+      background: #ef4444;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .video {
+      background: #1e293b;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    img {
+      width: 100%;
+      border-radius: 6px;
+    }
+    a { color: #38bdf8; text-decoration: none; }
+  </style>
+</head>
+
+<body>
+
+<h1>YouTube Last 1 Hour</h1>
+
+<input type="text" id="query" placeholder="Search keyword (news, shorts, etc)">
+<button onclick="searchYouTube()">Search</button>
+
+<div id="results"></div>
+
+<script>
+/* 🔴 YAHAN APNI YOUTUBE API KEY PASTE KARO */
+const API_KEY = "AIzaSyCuXqDlhc_Cc9kx5Yx-lJPMo8aoGjFzbeM";
+
+async function searchYouTube() {
+  const q = document.getElementById("query").value;
+  const results = document.getElementById("results");
+  results.innerHTML = "Loading...";
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&order=date&publishedAfter=${oneHourAgo}&maxResults=10&q=${encodeURIComponent(q)}&key=${API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.error) {
+      results.innerHTML = "API Error: " + data.error.message;
+      return;
+    }
+
+    results.innerHTML = "";
+
+    data.items.forEach(item => {
+      const videoId = item.id.videoId;
+      const title = item.snippet.title;
+      const thumb = item.snippet.thumbnails.medium.url;
+
+      results.innerHTML += `
+        <div class="video">
+          <img src="${thumb}">
+          <h3>${title}</h3>
+          <a target="_blank" href="https://www.youtube.com/watch?v=${videoId}">
+            Watch on YouTube
+          </a>
+        </div>
+      `;
+    });
+
+  } catch (e) {
+    results.innerHTML = "Something went wrong!";
+  }
+}
+</script>
+
+</body>
+</html>
