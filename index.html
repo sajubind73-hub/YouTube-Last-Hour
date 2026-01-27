@@ -3,48 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Last Hour Search</title>
+    <title>Youtube Search</title>
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f0f; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .container { max-width: 400px; width: 100%; text-align: center; background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid #333; }
-        h1 { color: #f00; margin-bottom: 25px; font-size: 1.5rem; }
-        input, select, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; font-size: 1rem; box-sizing: border-box; outline: none; }
-        input, select { background: #222; color: #fff; }
-        button { background: #f00; color: #fff; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #FFD194 0%, #D1913C 100%);
+            --container-bg: rgba(255, 255, 255, 0.85);
+            --text-color: #2c3e50;
+            --input-bg: #ffffff;
+            --border-color: #ecf0f1;
+            --history-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            --container-bg: #2c2c2c;
+            --text-color: #ffffff;
+            --input-bg: #3d3d3d;
+            --border-color: #444444;
+            --history-bg: #333333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg-gradient); 
+            background-attachment: fixed;
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px; 
+            transition: all 0.4s ease; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        
+        .header-row { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+
+        .container { 
+            max-width: 400px; width: 100%; text-align: center; 
+            background: var(--container-bg); padding: 25px; border-radius: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        h1 { color: #d32f2f; font-size: 1.4rem; margin: 0 0 20px 0; font-weight: 800; }
+
+        .input-group { position: relative; width: 100%; display: flex; align-items: center; }
+        input { 
+            width: 100%; padding: 16px; padding-right: 85px; border-radius: 15px; 
+            border: 1px solid var(--border-color); background: var(--input-bg); 
+            color: var(--text-color); font-size: 1rem; outline: none; 
+        }
+
+        .mic-btn { position: absolute; right: 45px; cursor: pointer; font-size: 1.3rem; }
+        .clear-input { position: absolute; right: 15px; cursor: pointer; color: #999; font-size: 1.2rem; }
+
+        select { 
+            width: 100%; padding: 14px; margin: 15px 0; border-radius: 15px; 
+            background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); 
+        }
+
+        .btn-row { display: flex; gap: 12px; }
+        button { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .search-btn { background: #d32f2f; color: #fff; }
+        .paste-btn { background: #2e7d32; color: #fff; }
+
+        .history { width: 100%; max-width: 400px; margin-top: 25px; }
+        .history-item { 
+            background: var(--history-bg); padding: 14px; margin: 8px 0; border-radius: 15px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            border: 1px solid var(--border-color); cursor: pointer; 
+        }
+
+        /* Branding Style */
+        .footer-branding {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+        .footer-branding span { color: #d32f2f; }
     </style>
 </head>
-<body>
+<body class="light-mode">
+
+<div class="header-row">
+    <div style="font-weight: bold; opacity: 0.7;">Pro Search Tool</div>
+    <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"> 🌙 Dark</label>
+</div>
 
 <div class="container">
-    <h1>YouTube Search Pro</h1>
-    <input type="text" id="query" placeholder="यहाँ कीवर्ड लिखें...">
+    <h1>YOUTUBE SEARCH</h1>
+    <div class="input-group">
+        <input type="text" id="query" placeholder="सर्च या पेस्ट करें..." oninput="toggleIcons()">
+        <span class="mic-btn" onclick="startVoice()">🎙️</span>
+        <span class="clear-input" id="clearBtn" onclick="clearInput()" style="display:none;">✕</span>
+    </div>
     
     <select id="timeFilter">
-        <option value="EgQIARAB">Last Hour (पिछला 1 घंटा)</option>
-        <option value="EgQIAhAB">Today (आज)</option>
-        <option value="EgQIAxAB">This Week (इस हफ्ते)</option>
+        <option value="EgQIARAB">🕒 Last Hour</option>
+        <option value="EgQIAhAB"> Today</option>
+        <option value="EgQIAxAB"> This Week</option>
     </select>
 
-    <button onclick="doSearch()">Search Now</button>
+    <div class="btn-row">
+        <button class="search-btn" onclick="doSearch()"> Search... </button>
+        <button class="paste-btn" onclick="pasteAndSearch()">📋 पेस्ट</button>
+    </div>
+</div>
+
+<div class="history">
+    <div id="historyList"></div>
+    <span onclick="clearHistory()" id="clearHist" style="color:#d32f2f; font-size:0.8rem; cursor:pointer; text-align:right; display:none; font-weight:bold; margin-top:10px;"> Clear History </span>
+</div>
+
+<div class="footer-branding">
+    Powered by <span>Mr. Saju</span>
 </div>
 
 <script>
-    function doSearch() {
-        const query = document.getElementById('query').value.trim();
-        const filter = document.getElementById('timeFilter').value;
+    window.onload = displayHistory;
 
-        if (!query) {
-            alert("कृपया कुछ कीवर्ड लिखें!");
-            return;
-        }
-
-        // YouTube का ओरिजिनल सर्च URL फॉर्मेट
-        const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${filter}`;
-
-        // सीधे YouTube ऐप या वेबसाइट पर भेजें
-        window.location.href = searchUrl;
+    function toggleTheme() {
+        document.body.className = document.getElementById('themeToggle').checked ? 'dark-mode' : 'light-mode';
     }
+
+    async function pasteAndSearch() {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) { document.getElementById('query').value = text; doSearch(text); }
+        } catch (err) { alert("अनुमति दें!"); }
+    }
+
+    function startVoice() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'hi-IN';
+        recognition.start();
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('query').value = transcript;
+            doSearch(transcript);
+        };
+    }
+
+    function doSearch(keyword = null) {
+        const query = keyword || document.getElementById('query').value.trim();
+        const filter = document.getElementById('timeFilter').value;
+        if (!query) return;
+        saveHistory(query);
+        window.location.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${filter}`;
+    }
+
+    function toggleIcons() {
+        document.getElementById('clearBtn').style.display = document.getElementById('query').value ? "block" : "none";
+    }
+
+    function clearInput() { document.getElementById('query').value = ''; toggleIcons(); }
+
+    function saveHistory(q) {
+        let h = JSON.parse(localStorage.getItem('yt_h')) || [];
+        h = h.filter(i => i !== q); h.unshift(q);
+        if(h.length > 5) h.pop();
+        localStorage.setItem('yt_h', JSON.stringify(h));
+        displayHistory();
+    }
+
+    function displayHistory() {
+        let h = JSON.parse(localStorage.getItem('yt_h')) || [];
+        const list = document.getElementById('historyList');
+        const clearBtn = document.getElementById('clearHist');
+        list.innerHTML = h.length > 0 ? '<div style="font-size:0.8rem; opacity:0.7; margin-bottom:5px;">हालिया सर्च:</div>' : '';
+        h.forEach(i => { 
+            list.innerHTML += `<div class="history-item" onclick="doSearch('${i}')"><span>📜 ${i}</span><span>🔍</span></div>`; 
+        });
+        clearBtn.style.display = h.length > 0 ? 'block' : 'none';
+    }
+
+    function clearHistory() { if(confirm("Clear history?")) { localStorage.removeItem('yt_h'); displayHistory(); } }
 </script>
 
 </body>
