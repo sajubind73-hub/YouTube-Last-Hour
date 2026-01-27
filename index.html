@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Youtube Search</title>
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FFD194 0%, #D1913C 100%);
@@ -31,12 +30,9 @@
             background: var(--bg-gradient); 
             background-attachment: fixed;
             color: var(--text-color); 
-            margin: 0; 
-            padding: 20px; 
+            margin: 0; padding: 20px; 
             transition: all 0.4s ease; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            display: flex; flex-direction: column; align-items: center; 
             min-height: 100vh;
         }
         
@@ -53,79 +49,84 @@
 
         .input-group { position: relative; width: 100%; display: flex; align-items: center; }
         input { 
-            width: 100%; padding: 16px; padding-right: 85px; border-radius: 15px; 
-            border: 1px solid var(--border-color); background: var(--input-bg); 
-            color: var(--text-color); font-size: 1rem; outline: none; 
+            width: 100%; padding: 16px; padding-right: 50px; 
+            border-radius: 15px; border: 1px solid var(--border-color); 
+            background: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none; 
         }
 
-        .mic-btn { position: absolute; right: 45px; cursor: pointer; font-size: 1.3rem; }
-        .clear-input { position: absolute; right: 15px; cursor: pointer; color: #999; font-size: 1.2rem; }
+        .mic-btn { position: absolute; right: 15px; cursor: pointer; font-size: 1.3rem; }
 
         select { 
             width: 100%; padding: 14px; margin: 15px 0; border-radius: 15px; 
             background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); 
         }
 
-        .btn-row { display: flex; gap: 12px; }
-        button { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .search-btn { background: #d32f2f; color: #fff; }
-        .paste-btn { background: #2e7d32; color: #fff; }
+        /* Search aur Clear Buttons ka row */
+        .btn-row { display: flex; gap: 10px; margin-top: 5px; }
+        
+        button { 
+            flex: 1; padding: 16px; border-radius: 15px; border: none; 
+            font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s;
+        }
+
+        .search-btn { background: #d32f2f; color: #fff; box-shadow: 0 4px 15px rgba(211,47,47,0.2); }
+        .clear-btn { background: #28a745; color: #fff; box-shadow: 0 4px 15px rgba(40,167,69,0.2); }
+        button:active { transform: scale(0.95); }
+
+        /* Branding Animation */
+        @keyframes glow {
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); color: #d32f2f; }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+
+        .footer-branding { 
+            margin-top: auto; padding: 20px; font-weight: bold; 
+            animation: glow 2.5s infinite ease-in-out; 
+        }
+        .footer-branding span { color: #d32f2f; }
 
         .history { width: 100%; max-width: 400px; margin-top: 25px; }
         .history-item { 
-            background: var(--history-bg); padding: 14px; margin: 8px 0; border-radius: 15px; 
-            display: flex; align-items: center; justify-content: space-between; 
-            border: 1px solid var(--border-color); cursor: pointer; 
+            background: var(--history-bg); padding: 14px; margin: 8px 0; 
+            border-radius: 15px; display: flex; align-items: center; 
+            justify-content: space-between; border: 1px solid var(--border-color); 
+            cursor: pointer; 
         }
-
-        /* Branding Style */
-        .footer-branding {
-            margin-top: auto;
-            padding: 20px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            letter-spacing: 1px;
-        }
-        .footer-branding span { color: #d32f2f; }
     </style>
 </head>
 <body class="light-mode">
 
 <div class="header-row">
-    <div style="font-weight: bold; opacity: 0.7;">Pro Search Tool</div>
+    <div style="font-weight: bold; opacity: 0.7;">V1.0 Pro</div>
     <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"> 🌙 Dark</label>
 </div>
 
 <div class="container">
-    <h1>YOUTUBE SEARCH</h1>
+    <h1><b>YOUTUBE SEARCH</b></h1>
     <div class="input-group">
-        <input type="text" id="query" placeholder="सर्च या पेस्ट करें..." oninput="toggleIcons()">
+        <input type="text" id="query" placeholder="Search or Paste..." onpaste="handleAutoSearch()">
         <span class="mic-btn" onclick="startVoice()">🎙️</span>
-        <span class="clear-input" id="clearBtn" onclick="clearInput()" style="display:none;">✕</span>
     </div>
     
     <select id="timeFilter">
         <option value="EgQIARAB">🕒 Last Hour</option>
-        <option value="EgQIAhAB"> Today</option>
-        <option value="EgQIAxAB"> This Week</option>
+        <option value="EgQIAhAB">📅 Today</option>
+       <option value="EgQIAxAB">📅 This Week</option>
+       <option value="EgQIAxAB">📅 Any tine </option>
     </select>
 
     <div class="btn-row">
-        <button class="search-btn" onclick="doSearch()"> Search... </button>
-        <button class="paste-btn" onclick="pasteAndSearch()">📋 पेस्ट</button>
+        <button class="search-btn" onclick="doSearch()">SEARCH NOW</button>
+        <button class="clear-btn" onclick="clearInput()">CLEAR</button>
     </div>
 </div>
 
 <div class="history">
     <div id="historyList"></div>
-    <span onclick="clearHistory()" id="clearHist" style="color:#d32f2f; font-size:0.8rem; cursor:pointer; text-align:right; display:none; font-weight:bold; margin-top:10px;"> Clear History </span>
 </div>
 
-<div class="footer-branding">
-    Powered by <span>Mr. Saju</span>
-</div>
+<div class="footer-branding">Powered by <span>Mr. Saju</span></div>
 
 <script>
     window.onload = displayHistory;
@@ -134,17 +135,20 @@
         document.body.className = document.getElementById('themeToggle').checked ? 'dark-mode' : 'light-mode';
     }
 
-    async function pasteAndSearch() {
-        try {
-            const text = await navigator.clipboard.readText();
-            if (text) { document.getElementById('query').value = text; doSearch(text); }
-        } catch (err) { alert("अनुमति दें!"); }
+    // Auto search on paste
+    function handleAutoSearch() {
+        setTimeout(() => {
+            const text = document.getElementById('query').value;
+            if (text.trim() !== "") { doSearch(text); }
+        }, 100);
     }
 
+    // English Voice Search
     function startVoice() {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'hi-IN';
+        recognition.lang = 'en-US';
         recognition.start();
+        
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             document.getElementById('query').value = transcript;
@@ -160,12 +164,6 @@
         window.location.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}&sp=${filter}`;
     }
 
-    function toggleIcons() {
-        document.getElementById('clearBtn').style.display = document.getElementById('query').value ? "block" : "none";
-    }
-
-    function clearInput() { document.getElementById('query').value = ''; toggleIcons(); }
-
     function saveHistory(q) {
         let h = JSON.parse(localStorage.getItem('yt_h')) || [];
         h = h.filter(i => i !== q); h.unshift(q);
@@ -177,15 +175,15 @@
     function displayHistory() {
         let h = JSON.parse(localStorage.getItem('yt_h')) || [];
         const list = document.getElementById('historyList');
-        const clearBtn = document.getElementById('clearHist');
-        list.innerHTML = h.length > 0 ? '<div style="font-size:0.8rem; opacity:0.7; margin-bottom:5px;">हालिया सर्च:</div>' : '';
+        list.innerHTML = h.length > 0 ? '<div style="font-size:0.8rem; opacity:0.7;">Recent:</div>' : '';
         h.forEach(i => { 
             list.innerHTML += `<div class="history-item" onclick="doSearch('${i}')"><span>📜 ${i}</span><span>🔍</span></div>`; 
         });
-        clearBtn.style.display = h.length > 0 ? 'block' : 'none';
     }
 
-    function clearHistory() { if(confirm("Clear history?")) { localStorage.removeItem('yt_h'); displayHistory(); } }
+    function clearInput() {
+        document.getElementById('query').value = '';
+    }
 </script>
 
 </body>
